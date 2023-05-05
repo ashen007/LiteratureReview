@@ -8,6 +8,79 @@ from selenium_stealth import stealth
 
 
 class ACM:
+    """
+    Parameters
+    ----------
+    start: int
+        start year of the date range filter
+
+    end: int
+        end year of the date range filter
+
+    search_terms: str
+        string of search terms (it can be comma seperated or semicolon
+        seperated string)
+
+    Attributes
+    ----------
+    driver: undetected_chromedriver.Chrome
+        web driver for selenium
+
+    page_count: int
+        number of pages in search results
+
+    links_to_paper: dict
+        mined links and additional details for results
+
+    origin: str
+        origin of science direct advanced search url
+
+    date_filter: str
+        date range to filter search results
+
+    results_in_a_page: str
+        number of records should show tin single page
+
+    start_page: str
+        where is the starting location in page numbering
+
+    query_text: str
+        encoded search query string to apply in URL
+
+    Methods
+    -------
+    encode_search_terms_into_query:
+        encode user given search terms into URL string
+
+    construct_full_link:
+        create full link to make request from server
+
+    create_query_text:
+        create encoded query text to insert in URL
+
+    init_driver:
+        initiate web driver and session
+
+    close_driver:
+        close web driver and session
+
+    post_request:
+        post a request to science direct server
+
+    check_for_multiple_pages:
+        check weather search results contains multiple pages
+        in results
+
+    mine_links:
+        get links to each search result (for each individual paper)
+
+    get_links_to_papers:
+        create paper link list
+
+    to_json:
+        dump results into json
+
+    """
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])

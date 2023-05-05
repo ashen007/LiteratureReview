@@ -78,7 +78,7 @@ class ScienceDirect:
     get_links_to_papers:
         create paper link list
 
-    to_csv:
+    to_json:
         dump results into json
 
     """
@@ -90,7 +90,7 @@ class ScienceDirect:
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.binary_location = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
 
-    def __init__(self, start, end, search_terms):
+    def __init__(self, start: int, end: int, search_terms: str):
         self.driver = None
         self.page_count = None
         self.links_to_paper = {}
@@ -102,7 +102,7 @@ class ScienceDirect:
         self.article_type = "&articleTypes=FLA"
 
     @staticmethod
-    def encode_search_terms_into_query(keywords):
+    def encode_search_terms_into_query(keywords: str) -> str:
         """
         encode user given search terms into URL string
 
@@ -121,7 +121,7 @@ class ScienceDirect:
 
         return f"&qs={encode}"
 
-    def construct_full_link(self):
+    def construct_full_link(self) -> str:
         """
         create full link to make request from server
 
@@ -136,7 +136,7 @@ class ScienceDirect:
                         self.offset,
                         self.article_type])
 
-    def init_driver(self):
+    def init_driver(self) -> None:
         """
         initiate web driver and session
 
@@ -147,7 +147,7 @@ class ScienceDirect:
         self.driver = undetected_chromedriver.Chrome(chrome_options=self.options,
                                                      executable_path='D:\\chromedriver.exe')
 
-    def close_driver(self):
+    def close_driver(self) -> None:
         """
         close web driver and session
 
@@ -157,7 +157,7 @@ class ScienceDirect:
         """
         self.driver.close()
 
-    def post_request(self, link):
+    def post_request(self, link: str) -> None:
         """
         post a request to science direct server
 
@@ -182,7 +182,7 @@ class ScienceDirect:
         self.driver.get(link)
         time.sleep(np.random.normal(2, 0.4))
 
-    def check_for_multiple_pages(self):
+    def check_for_multiple_pages(self) -> bool:
         """
         check weather search results contains multiple pages
         in results
@@ -203,7 +203,7 @@ class ScienceDirect:
 
         return True if self.page_count > 1 else False
 
-    def mine_links(self):
+    def mine_links(self) -> None:
         """
         get links to each search result (for each individual paper)
 
@@ -219,7 +219,7 @@ class ScienceDirect:
 
         time.sleep(np.random.uniform(2, 4))
 
-    def get_links_to_papers(self):
+    def get_links_to_papers(self) -> None:
         """
         create paper link list
 
@@ -244,7 +244,7 @@ class ScienceDirect:
             self.mine_links()
             self.close_driver()
 
-    def to_json(self, path):
+    def to_json(self, path: str) -> None:
         """
         dump results into json
 
