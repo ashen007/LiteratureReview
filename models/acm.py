@@ -105,7 +105,7 @@ class ACM:
         self.results_in_a_page = "&pageSize=50"
 
     @staticmethod
-    def encode_search_terms_into_query(keywords):
+    def encode_search_terms_into_query(keywords: str) -> str:
         """
         encode user given search terms into URL string
 
@@ -127,7 +127,7 @@ class ACM:
 
         return encode
 
-    def create_query_text(self):
+    def create_query_text(self) -> str:
         """
         create query text
 
@@ -137,7 +137,7 @@ class ACM:
         """
         return f"&AllField={self.encode_search_terms_into_query(self.search_terms)}"
 
-    def construct_full_link(self):
+    def construct_full_link(self) -> str:
         """
         create full link to make request from server
 
@@ -153,7 +153,7 @@ class ACM:
                         self.start_page,
                         self.results_in_a_page])
 
-    def init_driver(self):
+    def init_driver(self) -> None:
         """
         initiate web driver and session
 
@@ -164,7 +164,7 @@ class ACM:
         self.driver = undetected_chromedriver.Chrome(chrome_options=self.options,
                                                      executable_path='D:\\chromedriver.exe')
 
-    def close_driver(self):
+    def close_driver(self) -> None:
         """
         close web driver and session
 
@@ -174,7 +174,7 @@ class ACM:
         """
         self.driver.close()
 
-    def post_request(self, link):
+    def post_request(self, link) -> None:
         """
         post a request to science direct server
 
@@ -199,7 +199,7 @@ class ACM:
         self.driver.get(link)
         time.sleep(np.random.normal(2, 0.4))
 
-    def check_for_multiple_pages(self):
+    def check_for_multiple_pages(self) -> bool:
         """
         check weather search results contains multiple pages
         in results
@@ -221,7 +221,7 @@ class ACM:
 
         return True if self.page_count > 1 else False
 
-    def mine_links(self):
+    def mine_links(self) -> None:
         """
         get links to each search result (for each individual paper)
 
@@ -243,7 +243,7 @@ class ACM:
 
         time.sleep(np.random.uniform(2, 4))
 
-    def get_links_to_papers(self):
+    def get_links_to_papers(self) -> None:
         """
         create paper link list
 
@@ -268,7 +268,7 @@ class ACM:
             self.mine_links()
             self.close_driver()
 
-    def to_json(self, path):
+    def to_json(self, path) -> None:
         """
         dump results into json
 
