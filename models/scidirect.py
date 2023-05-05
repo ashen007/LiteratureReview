@@ -199,10 +199,9 @@ class ScienceDirect:
                                                    value="search-body-results-text").text.split(' ')[0])
         self.page_count = int(np.round(tot_results / 100))
 
-        time.sleep(2)
         self.close_driver()
 
-        return True if tot_results / 100 > 1 else False
+        return True if self.page_count > 1 else False
 
     def mine_links(self):
         """
@@ -214,7 +213,9 @@ class ScienceDirect:
         """
         for title, article in zip(self.driver.find_elements(By.CLASS_NAME, value="result-list-title-link"),
                                   self.driver.find_elements(By.CLASS_NAME, value="article-type")):
-            self.links_to_paper[title.get_attribute('id')] = [title.get_attribute('href'), article.text]
+            self.links_to_paper[title.get_attribute('id')] = [title.text,
+                                                              title.get_attribute('href'),
+                                                              article.text]
 
         time.sleep(np.random.uniform(2, 4))
 
@@ -233,7 +234,7 @@ class ScienceDirect:
                 self.post_request(self.construct_full_link())
                 self.mine_links()
 
-                print(f'reading page: {i+1} from {self.page_count}', end='\r')
+                print(f'reading page: {i + 1} from {self.page_count}', end='\r')
 
                 self.close_driver()
 
