@@ -41,7 +41,7 @@ class IEEE:
     get_links_to_papers:
         add all links to single object
 
-    to_csv:
+    to_json:
         dump links to json file
 
     """
@@ -141,7 +141,7 @@ class IEEE:
         else:
             self.mine_links()
 
-    def to_csv(self, path: str) -> None:
+    def to_json(self, path: str) -> None:
         """
         dump links to json file
 

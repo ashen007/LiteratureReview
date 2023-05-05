@@ -8,6 +8,81 @@ from selenium_stealth import stealth
 
 
 class ScienceDirect:
+    """
+    Parameters
+    ----------
+    start: int
+        start year of the date range filter
+
+    end: int
+        end year of the date range filter
+
+    search_terms: str
+        string of search terms (it can be comma seperated or semicolon
+        seperated string)
+
+    Attributes
+    ----------
+    driver: undetected_chromedriver.Chrome
+        web driver for selenium
+
+    page_count: int
+        number of pages in search results
+
+    links_to_paper: dict
+        mined links and additional details for results
+
+    origin: str
+        origin of science direct advanced search url
+
+    date_filter: str
+        date range to filter search results
+
+    results_in_a_page: str
+        number of records should show tin single page
+
+    offset: str
+        number of records should go forward for next page
+        in search results
+
+    query_text: str
+        encoded search query string to apply in URL
+
+    article_type: str
+        science direct article type category indicator
+
+    Methods
+    -------
+    encode_search_terms_into_query:
+        encode user given search terms into URL string
+
+    construct_full_link:
+        create full link to make request from server
+
+    init_driver:
+        initiate web driver and session
+
+    close_driver:
+        close web driver and session
+
+    post_request:
+        post a request to science direct server
+
+    check_for_multiple_pages:
+        check weather search results contains multiple pages
+        in results
+
+    mine_links:
+        get links to each search result (for each individual paper)
+
+    get_links_to_papers:
+        create paper link list
+
+    to_csv:
+        dump results into json
+
+    """
+
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -28,6 +103,18 @@ class ScienceDirect:
 
     @staticmethod
     def encode_search_terms_into_query(keywords):
+        """
+        encode user given search terms into URL string
+
+        Parameters
+        ----------
+        keywords: str
+            search terms to create search query
+
+        Returns
+        -------
+
+        """
         encode = keywords.replace(' ', "%20")
         encode = encode.replace(';', "%3B")
         encode = encode.replace(',', "%2C")
@@ -35,6 +122,13 @@ class ScienceDirect:
         return f"&qs={encode}"
 
     def construct_full_link(self):
+        """
+        create full link to make request from server
+
+        Returns
+        -------
+
+        """
         return ''.join([self.origin,
                         self.date_filter,
                         self.query_text,
@@ -43,13 +137,39 @@ class ScienceDirect:
                         self.article_type])
 
     def init_driver(self):
+        """
+        initiate web driver and session
+
+        Returns
+        -------
+
+        """
         self.driver = undetected_chromedriver.Chrome(chrome_options=self.options,
                                                      executable_path='D:\\chromedriver.exe')
 
     def close_driver(self):
+        """
+        close web driver and session
+
+        Returns
+        -------
+
+        """
         self.driver.close()
 
     def post_request(self, link):
+        """
+        post a request to science direct server
+
+        Parameters
+        ----------
+        link: str
+            URL to make request on
+
+        Returns
+        -------
+
+        """
         stealth(self.driver,
                 languages=["en-US", "en"],
                 vendor="Google Inc.",
@@ -63,6 +183,14 @@ class ScienceDirect:
         time.sleep(np.random.normal(2, 0.4))
 
     def check_for_multiple_pages(self):
+        """
+        check weather search results contains multiple pages
+        in results
+
+        Returns
+        -------
+
+        """
         link = self.construct_full_link()
         self.init_driver()
         self.post_request(link)
@@ -77,6 +205,13 @@ class ScienceDirect:
         return True if tot_results / 100 > 1 else False
 
     def mine_links(self):
+        """
+        get links to each search result (for each individual paper)
+
+        Returns
+        -------
+
+        """
         for title, article in zip(self.driver.find_elements(By.CLASS_NAME, value="result-list-title-link"),
                                   self.driver.find_elements(By.CLASS_NAME, value="article-type")):
             self.links_to_paper[title.get_attribute('id')] = [title.get_attribute('href'), article.text]
@@ -84,6 +219,13 @@ class ScienceDirect:
         time.sleep(np.random.uniform(2, 4))
 
     def get_links_to_papers(self):
+        """
+        create paper link list
+
+        Returns
+        -------
+
+        """
         if self.check_for_multiple_pages():
             for i in range(self.page_count):
                 self.offset = f"&offset={100 * i}"
@@ -99,6 +241,18 @@ class ScienceDirect:
             self.mine_links()
             self.close_driver()
 
-    def to_csv(self, path):
+    def to_json(self, path):
+        """
+        dump results into json
+
+        Parameters
+        ----------
+        path: str
+            string path for save results (link and additional details)
+
+        Returns
+        -------
+
+        """
         with open(path, 'w') as file:
             json.dump(self.links_to_paper, file)
