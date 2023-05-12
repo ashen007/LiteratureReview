@@ -179,6 +179,7 @@ class ScienceDirect:
                 fix_hairline=True,
                 )
         # make request
+        self.driver.delete_all_cookies()
         self.driver.get(link)
         time.sleep(np.random.normal(2, 0.4))
 
