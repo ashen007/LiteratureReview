@@ -181,7 +181,7 @@ class ScienceDirect:
         # make request
         self.driver.delete_all_cookies()
         self.driver.get(link)
-        time.sleep(np.random.normal(2, 0.4))
+        time.sleep(abs(np.random.normal(2, 0.4)))
 
     def check_for_multiple_pages(self) -> bool:
         """
@@ -218,7 +218,7 @@ class ScienceDirect:
                                                               title.get_attribute('href'),
                                                               article.text]
 
-        time.sleep(np.random.uniform(2, 4))
+        time.sleep(abs(np.random.uniform(2, 4)))
 
     def get_links_to_papers(self) -> None:
         """
