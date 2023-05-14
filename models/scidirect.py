@@ -2,16 +2,12 @@ import time
 import json
 import numpy as np
 import undetected_chromedriver
-
-from models.core import Core
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium_stealth import stealth
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
-class ScienceDirect(Core):
+class ScienceDirect:
     """
     Parameters
     ----------
@@ -87,6 +83,13 @@ class ScienceDirect(Core):
 
     """
 
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option('useAutomationExtension', False)
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.binary_location = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+
     def __init__(self, start: int, end: int, search_terms: str):
         self.driver = None
         self.page_count = None
@@ -95,19 +98,28 @@ class ScienceDirect(Core):
         self.date_filter = f"?date={start}-{end}"
         self.results_in_a_page = "&show=100"
         self.offset = "&offset=0"
-        self.search_terms = search_terms
+        self.query_text = self.encode_search_terms_into_query(search_terms)
         self.article_type = "&articleTypes=FLA"
-        self.query_text = self.create_query_text()
 
-    def create_query_text(self) -> str:
+    @staticmethod
+    def encode_search_terms_into_query(keywords: str) -> str:
         """
-        create query text
+        encode user given search terms into URL string
+
+        Parameters
+        ----------
+        keywords: str
+            search terms to create search query
 
         Returns
         -------
 
         """
-        return f"&qs={self.encode_search_terms_into_query(self.search_terms, 'SCIDIR')}"
+        encode = keywords.replace(' ', "%20")
+        encode = encode.replace(';', "%3B")
+        encode = encode.replace(',', "%2C")
+
+        return f"&qs={encode}"
 
     def construct_full_link(self) -> str:
         """
@@ -123,6 +135,53 @@ class ScienceDirect(Core):
                         self.results_in_a_page,
                         self.offset,
                         self.article_type])
+
+    def init_driver(self) -> None:
+        """
+        initiate web driver and session
+
+        Returns
+        -------
+
+        """
+        self.driver = undetected_chromedriver.Chrome(chrome_options=self.options,
+                                                     executable_path='D:\\chromedriver.exe')
+
+    def close_driver(self) -> None:
+        """
+        close web driver and session
+
+        Returns
+        -------
+
+        """
+        self.driver.close()
+
+    def post_request(self, link: str) -> None:
+        """
+        post a request to science direct server
+
+        Parameters
+        ----------
+        link: str
+            URL to make request on
+
+        Returns
+        -------
+
+        """
+        stealth(self.driver,
+                languages=["en-US", "en"],
+                vendor="Google Inc.",
+                platform="Win32",
+                webgl_vendor="Intel Inc.",
+                renderer="Intel Iris OpenGL Engine",
+                fix_hairline=True,
+                )
+        # make request
+        self.driver.delete_all_cookies()
+        self.driver.get(link)
+        time.sleep(abs(np.random.normal(2, 0.4)))
 
     def check_for_multiple_pages(self) -> bool:
         """
@@ -141,7 +200,6 @@ class ScienceDirect(Core):
                                                    value="search-body-results-text").text.split(' ')[0])
         self.page_count = int(np.round(tot_results / 100))
 
-        time.sleep(abs(np.random.uniform(2, 4)))
         self.close_driver()
 
         return True if self.page_count > 1 else False
@@ -187,184 +245,7 @@ class ScienceDirect(Core):
             self.mine_links()
             self.close_driver()
 
-
-class Paper:
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_experimental_option('useAutomationExtension', False)
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.binary_location = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-
-    def __init__(self, file_name):
-        self.driver = None
-        self.destination = file_name
-
-        with open(file_name, "r") as file:
-            self.link_object = json.load(file)
-
-    def init_driver(self) -> None:
-        """
-        initiate web driver and session
-
-        Returns
-        -------
-
-        """
-        self.driver = undetected_chromedriver.Chrome(chrome_options=self.options,
-                                                     executable_path='D:\\chromedriver.exe')
-
-    def close_driver(self) -> None:
-        """
-        close web driver and session
-
-        Returns
-        -------
-
-        """
-        self.driver.close()
-
-    def request_paper(self, page_link) -> None:
-        """
-        post a request to science direct server
-
-        Parameters
-        ----------
-        page_link: str
-            URL to make request on
-
-        Returns
-        -------
-
-        """
-        stealth(self.driver,
-                languages=["en-US", "en"],
-                vendor="Google Inc.",
-                platform="Win32",
-                webgl_vendor="Intel Inc.",
-                renderer="Intel Iris OpenGL Engine",
-                fix_hairline=True,
-                )
-
-        URL = page_link
-
-        # make request
-        self.driver.delete_all_cookies()
-        self.driver.get(URL)
-
-        time.sleep(abs(np.random.normal(1, 0.4)))
-
-    def get_abstract_text(self) -> str:
-        """
-        get abstract from each publication
-
-        Returns
-        -------
-        abstract: str
-
-        """
-        return self.driver.find_element(By.CLASS_NAME, 'abstract').text.replace('Abstract:\n', '')
-
-    # def click_kw_section(self) -> None:
-    #     self.driver.execute_script("arguments[0].scrollIntoView();",
-    #                                self.driver.find_element(By.ID, 'keywords'))
-    #     WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'keywords'))).click()
-    #     time.sleep(1)
-    #
-    # def get_keywords(self) -> list:
-    #     """
-    #     get all type of keywords in ieee xplore for the publication
-    #
-    #     Returns
-    #     -------
-    #     list of keyword strings: list
-    #
-    #     """
-    #     kw_types = self.driver.find_elements(By.CSS_SELECTOR,
-    #                                          "ul[class='doc-keywords-list stats-keywords-list']>li["
-    #                                          "class='doc-keywords-list-item']>ul")
-    #     return [kw.text.replace('\n', '') for kw in kw_types if kw.text != '']
-
-    def update_paper_details(self) -> None:
-        """
-        update the detail object of the publications
-
-        Returns
-        -------
-
-        """
-        # start driver
-        self.init_driver()
-
-        for key, value in self.link_object.items():
-            doc_link = value[1]
-            self.request_paper(doc_link)
-            # self.click_kw_section()
-
-            time.sleep(abs(np.random.normal(1, 0.4)))
-
-            try:
-                abstract = self.get_abstract_text()
-                # kws = self.get_keywords()
-
-            except:
-                abstract = np.NAN
-                # kws = np.NAN
-
-            if abstract not in value:
-                value.append(abstract)
-
-            # if kws not in value:
-            #     value.append(kws)
-
-        # close driver
-        self.close_driver()
-
-    def batch_update_details(self, size) -> None:
-        """
-        update the detail object of the publications batch wise
-
-        Parameters
-        ----------
-        size: int
-            size of a batch
-
-        Returns
-        -------
-
-        """
-        keys = list(self.link_object.keys())
-
-        for i in range(size, len(self.link_object), size):
-            batch = keys[(i - size):i]
-            self.init_driver()
-
-            for p in batch:
-                doc_link = self.link_object[p][1]
-                self.request_paper(doc_link)
-                # self.click_kw_section()
-
-                try:
-                    abstract = self.get_abstract_text()
-                    # kws = self.get_keywords()
-
-                except:
-                    abstract = np.NAN
-                    kws = np.NAN
-
-                if abstract not in self.link_object[p]:
-                    self.link_object[p].append(abstract)
-
-                # if kws not in self.link_object[p]:
-                #     self.link_object[p].append(kws)
-
-            # dump updated link object to json
-            self.to_json('./data/sci_temp.json')
-
-            # close driver
-            self.close_driver()
-
-    def to_json(self, path) -> None:
+    def to_json(self, path: str) -> None:
         """
         dump results into json
 
@@ -378,4 +259,4 @@ class Paper:
 
         """
         with open(path, 'w') as file:
-            json.dump(self.link_object, file)
+            json.dump(self.links_to_paper, file)
