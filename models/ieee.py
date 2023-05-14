@@ -5,6 +5,7 @@ import json
 import undetected_chromedriver
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.common import exceptions
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium_stealth import stealth
@@ -174,6 +175,7 @@ class Paper:
 
     def __init__(self, file_name):
         self.driver = None
+        self.failure = []
         self.destination = file_name
 
         with open(file_name, "r") as file:
@@ -226,9 +228,27 @@ class Paper:
 
         # make request
         self.driver.delete_all_cookies()
-        self.driver.get(URL)
+
+        try:
+            self.driver.get(URL)
+
+        except:
+            self.fall_back()
+            self.driver.get(URL)
 
         time.sleep(abs(np.random.normal(1, 0.4)))
+
+    def fall_back(self):
+        """
+        recover while errors happens when requesting page data
+
+        Returns
+        -------
+
+        """
+        self.close_driver()
+        time.sleep(1)
+        self.init_driver()
 
     def get_abstract_text(self) -> str:
         """
@@ -274,8 +294,18 @@ class Paper:
 
         for key, value in self.link_object.items():
             doc_link = value[1]
-            self.request_paper(doc_link)
-            self.click_kw_section()
+
+            try:
+                self.request_paper(doc_link)
+                self.click_kw_section()
+
+            except exceptions.NoSuchElementException:
+                self.fall_back()
+                self.request_paper(doc_link)
+                self.click_kw_section()
+
+            except:
+                continue
 
             time.sleep(abs(np.random.normal(1, 0.4)))
 
@@ -335,7 +365,7 @@ class Paper:
                     self.link_object[p].append(kws)
 
             # dump updated link object to json
-            self.to_json('./data/temp.json')
+            self.to_json('./data/ieee_temp.json')
 
             # close driver
             self.close_driver()
