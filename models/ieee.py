@@ -1,8 +1,10 @@
+import os
 import time
 import requests
 import numpy as np
 import json
 import undetected_chromedriver
+
 from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.common.by import By
@@ -347,8 +349,18 @@ class Paper:
 
             for p in batch:
                 doc_link = self.link_object[p][1]
-                self.request_paper(doc_link)
-                self.click_kw_section()
+
+                try:
+                    self.request_paper(doc_link)
+                    self.click_kw_section()
+
+                except exceptions.NoSuchElementException:
+                    self.fall_back()
+                    self.request_paper(doc_link)
+                    self.click_kw_section()
+
+                except:
+                    continue
 
                 try:
                     abstract = self.get_abstract_text()
@@ -365,7 +377,8 @@ class Paper:
                     self.link_object[p].append(kws)
 
             # dump updated link object to json
-            self.to_json('./data/ieee_temp.json')
+            with open('./ieee_temp.json', 'w') as file:
+                json.dump(self.link_object, file)
 
             # close driver
             self.close_driver()
@@ -383,5 +396,11 @@ class Paper:
         -------
 
         """
+        if os.path.isfile('./ieee_temp.json'):
+            with open('./ieee_temp.json') as file:
+                self.link_object = json.load(file)
+
+            os.remove('./ieee_temp.json')
+
         with open(path, 'w') as file:
             json.dump(self.link_object, file)

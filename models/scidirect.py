@@ -1,3 +1,4 @@
+import os
 import time
 import json
 import numpy as np
@@ -373,23 +374,17 @@ class Paper:
         for key, value in self.link_object.items():
             doc_link = value[1]
             self.request_paper(doc_link)
-            # self.click_kw_section()
 
             time.sleep(abs(np.random.normal(1, 0.4)))
 
             try:
                 abstract = self.get_abstract_text()
-                # kws = self.get_keywords()
 
             except:
                 abstract = np.NAN
-                # kws = np.NAN
 
             if abstract not in value:
                 value.append(abstract)
-
-            # if kws not in value:
-            #     value.append(kws)
 
         # close driver
         self.close_driver()
@@ -416,24 +411,19 @@ class Paper:
             for p in batch:
                 doc_link = self.link_object[p][1]
                 self.request_paper(doc_link)
-                # self.click_kw_section()
 
                 try:
                     abstract = self.get_abstract_text()
-                    # kws = self.get_keywords()
 
                 except:
                     abstract = np.NAN
-                    kws = np.NAN
 
                 if abstract not in self.link_object[p]:
                     self.link_object[p].append(abstract)
 
-                # if kws not in self.link_object[p]:
-                #     self.link_object[p].append(kws)
-
             # dump updated link object to json
-            self.to_json('./data/sci_temp.json')
+            with open('./sci_temp.json', 'w') as file:
+                json.dump(self.link_object, file)
 
             # close driver
             self.close_driver()
@@ -451,5 +441,11 @@ class Paper:
         -------
 
         """
+        if os.path.isfile('./sci_temp.json'):
+            with open('./sci_temp.json') as file:
+                self.link_object = json.load(file)
+
+            os.remove('./sci_temp.json')
+
         with open(path, 'w') as file:
             json.dump(self.link_object, file)
