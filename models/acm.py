@@ -419,49 +419,49 @@ class Paper:
         # close driver
         self.close_driver()
 
-    # def batch_update_details(self, size) -> None:
-    #     """
-    #     update the detail object of the publications batch wise
-    #
-    #     Parameters
-    #     ----------
-    #     size: int
-    #         size of a batch
-    #
-    #     Returns
-    #     -------
-    #
-    #     """
-    #     keys = list(self.link_object.keys())
-    #
-    #     for i in range(size, len(self.link_object), size):
-    #         batch = keys[(i - size):i]
-    #         self.init_driver()
-    #
-    #         for p in batch:
-    #             doc_link = self.link_object[p][1]
-    #             self.request_paper(doc_link)
-    #             # self.click_kw_section()
-    #
-    #             try:
-    #                 abstract = self.get_abstract_text()
-    #                 # kws = self.get_keywords()
-    #
-    #             except:
-    #                 abstract = np.NAN
-    #                 kws = np.NAN
-    #
-    #             if abstract not in self.link_object[p]:
-    #                 self.link_object[p].append(abstract)
-    #
-    #             # if kws not in self.link_object[p]:
-    #             #     self.link_object[p].append(kws)
-    #
-    #         # dump updated link object to json
-    #         self.to_json('./data/temp.json')
-    #
-    #         # close driver
-    #         self.close_driver()
+    def batch_update_details(self, size) -> None:
+        """
+        update the detail object of the publications batch wise
+
+        Parameters
+        ----------
+        size: int
+            size of a batch
+
+        Returns
+        -------
+
+        """
+        keys = list(self.link_object.keys())
+
+        for i in range(size, len(self.link_object), size):
+            batch = keys[(i - size):i]
+            self.init_driver()
+
+            for p in batch:
+                doc_link = self.link_object[p][1]
+                self.request_paper(doc_link)
+                # self.click_kw_section()
+
+                try:
+                    abstract = self.get_abstract_text()
+                    # kws = self.get_keywords()
+
+                except:
+                    abstract = np.NAN
+                    kws = np.NAN
+
+                if abstract not in self.link_object[p]:
+                    self.link_object[p].append(abstract)
+
+                # if kws not in self.link_object[p]:
+                #     self.link_object[p].append(kws)
+
+            # dump updated link object to json
+            self.to_json('./data/temp.json')
+
+            # close driver
+            self.close_driver()
 
     def to_json(self, path) -> None:
         """
