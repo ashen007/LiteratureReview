@@ -6,8 +6,7 @@ import undetected_chromedriver
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium_stealth import stealth
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from models.utils import read_json
 
 
 class ACM:
@@ -85,11 +84,13 @@ class ACM:
 
     """
     options = webdriver.ChromeOptions()
+    config = read_json('../config.json')
+
     options.add_argument("--headless")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option('useAutomationExtension', False)
     options.add_argument("--disable-blink-features=AutomationControlled")
-    options.binary_location = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+    options.binary_location = config['BINARY_LOCATION']
 
     def __init__(self,
                  start,
@@ -165,7 +166,7 @@ class ACM:
 
         """
         self.driver = undetected_chromedriver.Chrome(chrome_options=self.options,
-                                                     executable_path='D:\\chromedriver.exe')
+                                                     executable_path=self.config['EXECUTABLE_PATH'])
 
     def close_driver(self) -> None:
         """
@@ -291,11 +292,13 @@ class ACM:
 
 class Paper:
     options = webdriver.ChromeOptions()
+    config = read_json('../config.json')
+
     options.add_argument("--headless")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option('useAutomationExtension', False)
     options.add_argument("--disable-blink-features=AutomationControlled")
-    options.binary_location = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+    options.binary_location = config['BINARY_LOCATION']
 
     def __init__(self, file_name):
         self.driver = None
@@ -313,7 +316,7 @@ class Paper:
 
         """
         self.driver = undetected_chromedriver.Chrome(chrome_options=self.options,
-                                                     executable_path='D:\\chromedriver.exe')
+                                                     executable_path=self.config['EXECUTABLE_PATH'])
 
     def close_driver(self) -> None:
         """
