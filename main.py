@@ -1,5 +1,7 @@
-from models.scidirect import ScienceDirect
-from models.acm import ACM
+from src.scidirect import ScienceDirect, Paper
+from src.acm import ACM, Paper
+from src.ieee import IEEE, Paper
+from src.utils import read_json
 
 
 def get_links_to_acm_publications(query_text, file_name):
@@ -15,12 +17,5 @@ def get_links_to_sci_direct_publications(query_text, file_name):
 
 
 if __name__ == "__main__":
-    acm_query = "Keyword:(image segmentation OR semantic segmentation) AND AllField:(u-net) AND AllField:(forests) AND " \
-                "AllField:(\"remote sensing\" OR \"satellite images\")"
-    sci_direct_query = "semantic segmentation;u-net;forests;remote sensing;"
+    config = read_json("./config.json")
 
-    acm_dump = "acm_search_term_1.json"
-    sci_direct_dump = "scidir_search_term_1.json"
-
-    # get_links_to_acm_publications(acm_query, acm_dump)
-    get_links_to_sci_direct_publications(sci_direct_query, sci_direct_dump)

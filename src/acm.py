@@ -6,10 +6,10 @@ import undetected_chromedriver
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium_stealth import stealth
-from models.utils import read_json
+from src.utils import read_json
 
 
-class ScienceDirect:
+class ACM:
     """
     Parameters
     ----------
@@ -43,15 +43,11 @@ class ScienceDirect:
     results_in_a_page: str
         number of records should show tin single page
 
-    offset: str
-        number of records should go forward for next page
-        in search results
+    start_page: str
+        where is the starting location in page numbering
 
     query_text: str
         encoded search query string to apply in URL
-
-    article_type: str
-        science direct article type category indicator
 
     Methods
     -------
@@ -60,6 +56,9 @@ class ScienceDirect:
 
     construct_full_link:
         create full link to make request from server
+
+    create_query_text:
+        create encoded query text to insert in URL
 
     init_driver:
         initiate web driver and session
@@ -84,7 +83,6 @@ class ScienceDirect:
         dump results into json
 
     """
-
     options = webdriver.ChromeOptions()
     config = read_json('../config.json')
 
@@ -94,16 +92,21 @@ class ScienceDirect:
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.binary_location = config['BINARY_LOCATION']
 
-    def __init__(self, start: int, end: int, search_terms: str):
+    def __init__(self,
+                 start,
+                 end,
+                 search_terms):
         self.driver = None
         self.page_count = None
-        self.links_to_paper = {}
-        self.origin = "https://www.sciencedirect.com/search"
-        self.date_filter = f"?date={start}-{end}"
-        self.results_in_a_page = "&show=100"
-        self.offset = "&offset=0"
-        self.query_text = self.encode_search_terms_into_query(search_terms)
-        self.article_type = "&articleTypes=FLA"
+        self.links_to_paper = []
+        self.search_terms = search_terms
+        self.origin = "https://dl.acm.org/action/doSearch?"
+        self.quick_search = "fillQuickSearch=false"
+        self.target = "&target=advanced&expand=dl"
+        self.date_filter = f"&AfterYear={start}&BeforeYear={end}"
+        self.query_text = self.create_query_text()
+        self.start_page = "&startPage=0"
+        self.results_in_a_page = "&pageSize=50"
 
     @staticmethod
     def encode_search_terms_into_query(keywords: str) -> str:
@@ -119,11 +122,24 @@ class ScienceDirect:
         -------
 
         """
-        encode = keywords.replace(' ', "%20")
+        encode = keywords.replace(' ', "+")
         encode = encode.replace(';', "%3B")
+        encode = encode.replace(':', "%3A")
         encode = encode.replace(',', "%2C")
+        encode = encode.replace('(', "%28")
+        encode = encode.replace(')', "%29")
 
-        return f"&qs={encode}"
+        return encode
+
+    def create_query_text(self) -> str:
+        """
+        create query text
+
+        Returns
+        -------
+
+        """
+        return f"&AllField={self.encode_search_terms_into_query(self.search_terms)}"
 
     def construct_full_link(self) -> str:
         """
@@ -134,11 +150,12 @@ class ScienceDirect:
 
         """
         return ''.join([self.origin,
+                        self.quick_search,
+                        self.target,
                         self.date_filter,
                         self.query_text,
-                        self.results_in_a_page,
-                        self.offset,
-                        self.article_type])
+                        self.start_page,
+                        self.results_in_a_page])
 
     def init_driver(self) -> None:
         """
@@ -161,7 +178,7 @@ class ScienceDirect:
         """
         self.driver.close()
 
-    def post_request(self, link: str) -> None:
+    def post_request(self, link) -> None:
         """
         post a request to science direct server
 
@@ -201,8 +218,9 @@ class ScienceDirect:
         self.post_request(link)
 
         tot_results = int(self.driver.find_element(By.CLASS_NAME,
-                                                   value="search-body-results-text").text.split(' ')[0])
-        self.page_count = int(np.round(tot_results / 100))
+                                                   value="result__count").text.split(' ')[0])
+
+        self.page_count = int(np.round(tot_results / 50))
 
         self.close_driver()
 
@@ -216,11 +234,17 @@ class ScienceDirect:
         -------
 
         """
-        for title, article in zip(self.driver.find_elements(By.CLASS_NAME, value="result-list-title-link"),
-                                  self.driver.find_elements(By.CLASS_NAME, value="article-type")):
-            self.links_to_paper[title.get_attribute('id')] = [title.text,
-                                                              title.get_attribute('href'),
-                                                              article.text]
+        types = self.driver.find_elements(By.CLASS_NAME, value="issue-heading")
+        dates = self.driver.find_elements(By.CLASS_NAME, value="bookPubDate")
+        titles = self.driver.find_elements(By.CLASS_NAME, value="issue-item__title")
+        links = self.driver.find_elements(By.CSS_SELECTOR,
+                                          value="h5[class='issue-item__title']>span[class='hlFld-Title']>a")
+
+        for type_, date, title, link in zip(types, dates, titles, links):
+            self.links_to_paper.append({"type_": type_.text,
+                                        "date": date.text,
+                                        "title": title.text,
+                                        "link": link.get_attribute('href')})
 
         time.sleep(abs(np.random.uniform(2, 4)))
 
@@ -233,8 +257,8 @@ class ScienceDirect:
 
         """
         if self.check_for_multiple_pages():
-            for i in range(self.page_count):
-                self.offset = f"&offset={100 * i}"
+            for i in range(1, (self.page_count + 1)):
+                self.start_page = f"&startPage={i}"
                 self.init_driver()
                 self.post_request(self.construct_full_link())
                 self.mine_links()
@@ -249,7 +273,7 @@ class ScienceDirect:
             self.mine_links()
             self.close_driver()
 
-    def to_json(self, path: str) -> None:
+    def to_json(self, path) -> None:
         """
         dump results into json
 
@@ -343,14 +367,14 @@ class Paper:
         abstract: str
 
         """
-        return self.driver.find_element(By.CLASS_NAME, 'abstract').text.replace('Abstract:\n', '')
+        return self.driver.find_element(By.CLASS_NAME, 'abstractInFull').text
 
     # def click_kw_section(self) -> None:
     #     self.driver.execute_script("arguments[0].scrollIntoView();",
     #                                self.driver.find_element(By.ID, 'keywords'))
     #     WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'keywords'))).click()
     #     time.sleep(1)
-    #
+
     # def get_keywords(self) -> list:
     #     """
     #     get all type of keywords in ieee xplore for the publication
@@ -376,20 +400,25 @@ class Paper:
         # start driver
         self.init_driver()
 
-        for key, value in self.link_object.items():
-            doc_link = value[1]
+        for obj in self.link_object:
+            doc_link = obj['link']
             self.request_paper(doc_link)
+            # self.click_kw_section()
 
             time.sleep(abs(np.random.normal(1, 0.4)))
 
             try:
                 abstract = self.get_abstract_text()
+                # kws = self.get_keywords()
 
             except:
                 abstract = np.NAN
+                # kws = np.NAN
 
-            if abstract not in value:
-                value.append(abstract)
+            obj['abs'] = abstract
+
+            # if kws not in value:
+            #     value.append(kws)
 
         # close driver
         self.close_driver()
@@ -427,7 +456,7 @@ class Paper:
                     self.link_object[p].append(abstract)
 
             # dump updated link object to json
-            with open('./sci_temp.json', 'w') as file:
+            with open('./acm_temp.json', 'w') as file:
                 json.dump(self.link_object, file)
 
             # close driver
@@ -446,11 +475,11 @@ class Paper:
         -------
 
         """
-        if os.path.isfile('./sci_temp.json'):
-            with open('./sci_temp.json') as file:
+        if os.path.isfile('./acm_temp.json'):
+            with open('./acm_temp.json') as file:
                 self.link_object = json.load(file)
 
-            os.remove('./sci_temp.json')
+            os.remove('./acm_temp.json')
 
         with open(path, 'w') as file:
             json.dump(self.link_object, file)
