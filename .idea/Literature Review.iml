@@ -7,7 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/notebooks" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (LiteratureReview)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (Literature Review)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

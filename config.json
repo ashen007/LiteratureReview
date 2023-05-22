@@ -10,7 +10,7 @@
     "keep_link_file": true
   },
   "ACM": {
-    "search_term": "Keyword:(image segmentation OR semantic segmentation) AND AllField:(u-net) AND AllField:(forests) AND AllField:(\\\"remote sensing\\\" OR \\\"satellite images\\\")",
+    "search_term": "Keyword:(image segmentation OR semantic segmentation) AND AllField:(u-net) AND AllField:(forests) AND AllField:(\"remote sensing\" OR \"satellite images\")",
     "link_file_save_to": "./temp/acm_search_term.json",
     "abs_file_save_to": "./abs/acm_search_term.json",
     "use_batches": true,
