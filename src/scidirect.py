@@ -86,7 +86,7 @@ class ScienceDirect:
     """
 
     options = webdriver.ChromeOptions()
-    config = read_json('../config.json')
+    config = read_json('./config.json')
 
     options.add_argument("--headless")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -268,7 +268,7 @@ class ScienceDirect:
 
 class Paper:
     options = webdriver.ChromeOptions()
-    config = read_json('../config.json')
+    config = read_json('./config.json')
 
     options.add_argument("--headless")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])

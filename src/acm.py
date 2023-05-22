@@ -84,7 +84,7 @@ class ACM:
 
     """
     options = webdriver.ChromeOptions()
-    config = read_json('../config.json')
+    config = read_json('./config.json')
 
     options.add_argument("--headless")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -98,7 +98,7 @@ class ACM:
                  search_terms):
         self.driver = None
         self.page_count = None
-        self.links_to_paper = []
+        self.links_to_paper = {}
         self.search_terms = search_terms
         self.origin = "https://dl.acm.org/action/doSearch?"
         self.quick_search = "fillQuickSearch=false"
@@ -241,10 +241,10 @@ class ACM:
                                           value="h5[class='issue-item__title']>span[class='hlFld-Title']>a")
 
         for type_, date, title, link in zip(types, dates, titles, links):
-            self.links_to_paper.append({"type_": type_.text,
-                                        "date": date.text,
-                                        "title": title.text,
-                                        "link": link.get_attribute('href')})
+            self.links_to_paper[f'{link.get_attribute("href").split("/")[-1]}'] = {"type_": type_.text,
+                                                                                   "date": date.text,
+                                                                                   "title": title.text,
+                                                                                   "link": link.get_attribute('href')}
 
         time.sleep(abs(np.random.uniform(2, 4)))
 
@@ -292,7 +292,7 @@ class ACM:
 
 class Paper:
     options = webdriver.ChromeOptions()
-    config = read_json('../config.json')
+    config = read_json('./config.json')
 
     options.add_argument("--headless")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -400,7 +400,7 @@ class Paper:
         # start driver
         self.init_driver()
 
-        for obj in self.link_object:
+        for obj in self.link_object.values():
             doc_link = obj['link']
             self.request_paper(doc_link)
             # self.click_kw_section()
