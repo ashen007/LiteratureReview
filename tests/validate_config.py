@@ -9,7 +9,7 @@ def test_is_config_exists(file_name='x.json'):
         read_json(file_name)
 
 
-def test_whether_config_empty(file_name='./empty.json'):
+def test_whether_config_empty(file_name='tests/empty.json'):
     config = read_json(file_name)
 
     with raises(ConfigurationError):
@@ -17,12 +17,12 @@ def test_whether_config_empty(file_name='./empty.json'):
 
 
 def test_config_file():
-    config = read_json('../config.json')
+    config = read_json('config.json')
     validate(config)
 
 
 def test_able_to_identify_bad_config():
-    config = read_json('./bad.json')
+    config = read_json('tests/bad.json')
 
     with raises(ConfigurationError):
         validate(config)
