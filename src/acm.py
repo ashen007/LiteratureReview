@@ -443,7 +443,7 @@ class Paper:
             self.init_driver()
 
             for p in batch:
-                doc_link = self.link_object[p][1]
+                doc_link = self.link_object[p]["link"]
                 self.request_paper(doc_link)
 
                 try:
@@ -452,8 +452,8 @@ class Paper:
                 except:
                     abstract = np.NAN
 
-                if abstract not in self.link_object[p]:
-                    self.link_object[p].append(abstract)
+                if abstract not in list(self.link_object[p].values()):
+                    self.link_object[p]["abs"] = abstract
 
             # dump updated link object to json
             with open('./acm_temp.json', 'w') as file:
