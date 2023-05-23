@@ -22,18 +22,11 @@ def clean_cookies_and_caches(driver):
         driver.delete_all_cookies()
 
     # step 2
-    # navigate to the settings page
-    driver.get('chrome://settings/clearBrowserData')
+    # method 1
+    driver.execute_script('window.localStorage.clear()')
 
-    # wait for the button to appear
-    wait = WebDriverWait(driver, 60)
-    wait.until(driver.find_element_by_css_selector('* /deep/ #clearBrowsingDataConfirm'))
-
-    # click the button to clear the cache
-    driver.find_element_by_css_selector('* /deep/ #clearBrowsingDataConfirm').click()
-
-    # wait for the button to be gone before returning
-    wait.until_not(driver.find_element_by_css_selector('* /deep/ #clearBrowsingDataConfirm'))
+    # method 2
+    driver.execute_script('window.sessionStorage.clear()')
 
 
 def read_json(file_path):

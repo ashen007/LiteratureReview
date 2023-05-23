@@ -128,9 +128,9 @@ class IEEE:
         results = request.json()
 
         for record in results['records']:
-            self.links_to_paper[record['articleNumber']] = [record.get('articleTitle', None),
-                                                            record.get('documentLink', None),
-                                                            record.get('publicationYear', None)]
+            self.links_to_paper[record['articleNumber']] = {"title": record.get('articleTitle', None),
+                                                            "link": record.get('documentLink', None),
+                                                            "date": record.get('publicationYear', None)}
 
     def get_links_to_papers(self) -> None:
         """
