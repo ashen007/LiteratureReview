@@ -27,7 +27,7 @@ def read_json(file_path):
 def to_excel(sheets: dict):
     dfs = {key: pd.read_json(filename) for key, filename in sheets.items()}
 
-    with pd.ExcelWriter('./data/SLR.xlsx') as writer:
+    with pd.ExcelWriter('./SLR.xlsx') as writer:
         for sheet, df in dfs.items():
             df.T.to_excel(writer, sheet_name=sheet)
 
