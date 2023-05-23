@@ -219,9 +219,9 @@ class ScienceDirect:
         """
         for title, article in zip(self.driver.find_elements(By.CLASS_NAME, value="result-list-title-link"),
                                   self.driver.find_elements(By.CLASS_NAME, value="article-type")):
-            self.links_to_paper[title.get_attribute('id')] = [title.text,
-                                                              title.get_attribute('href'),
-                                                              article.text]
+            self.links_to_paper[title.get_attribute('id')] = {"title": title.text,
+                                                              "link": title.get_attribute('href'),
+                                                              "type_": article.text}
 
         time.sleep(abs(np.random.uniform(2, 4)))
 
@@ -379,7 +379,7 @@ class Paper:
         self.init_driver()
 
         for key, value in self.link_object.items():
-            doc_link = value[1]
+            doc_link = value["link"]
             self.request_paper(doc_link)
 
             time.sleep(abs(np.random.normal(1, 0.4)))
@@ -390,8 +390,7 @@ class Paper:
             except:
                 abstract = np.NAN
 
-            if abstract not in value:
-                value.append(abstract)
+            value["abs"] = abstract
 
         # close driver
         self.close_driver()
@@ -416,7 +415,7 @@ class Paper:
             self.init_driver()
 
             for p in batch:
-                doc_link = self.link_object[p][1]
+                doc_link = self.link_object[p]["link"]
                 self.request_paper(doc_link)
 
                 try:
@@ -425,8 +424,7 @@ class Paper:
                 except:
                     abstract = np.NAN
 
-                if abstract not in self.link_object[p]:
-                    self.link_object[p].append(abstract)
+                self.link_object[p]["abs"] = abstract
 
             # dump updated link object to json
             with open('./sci_temp.json', 'w') as file:

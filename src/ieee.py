@@ -299,7 +299,7 @@ class Paper:
         self.init_driver()
 
         for key, value in self.link_object.items():
-            doc_link = value[1]
+            doc_link = value["link"]
 
             try:
                 self.request_paper(doc_link)
@@ -323,11 +323,8 @@ class Paper:
                 abstract = np.NAN
                 kws = np.NAN
 
-            if abstract not in value:
-                value.append(abstract)
-
-            if kws not in value:
-                value.append(kws)
+            value["abs"] = abstract
+            value["kws"] = kws
 
         # close driver
         self.close_driver()
@@ -352,7 +349,7 @@ class Paper:
             self.init_driver()
 
             for p in batch:
-                doc_link = self.link_object[p][1]
+                doc_link = self.link_object[p]["link"]
 
                 try:
                     self.request_paper(doc_link)
@@ -374,11 +371,8 @@ class Paper:
                     abstract = np.NAN
                     kws = np.NAN
 
-                if abstract not in self.link_object[p]:
-                    self.link_object[p].append(abstract)
-
-                if kws not in self.link_object[p]:
-                    self.link_object[p].append(kws)
+                self.link_object[p]["abs"] = abstract
+                self.link_object[p]["abs"] = kws
 
             # dump updated link object to json
             with open('./ieee_temp.json', 'w') as file:

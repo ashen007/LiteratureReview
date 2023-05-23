@@ -92,6 +92,8 @@ if __name__ == "__main__":
             else:
                 sd_paper.update_paper_details()
 
+            sd_paper.to_json(config['SCIDIR']['abs_file_save_to'])
+
             if not config['SCIDIR']['keep_link_file']:
                 os.remove(config['SCIDIR']['link_file_save_to'])
 
