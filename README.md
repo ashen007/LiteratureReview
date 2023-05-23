@@ -7,8 +7,6 @@ useful to do the systematic literature review process make easy.
 
 _*If you find this work usefully, put a star on this repo ⭐*_
 
-https://img.shields.io/github/stars/ashen007/LiteratureReview?style=social
-
 # Prerequisites
 
 - python 3.9 or higher
