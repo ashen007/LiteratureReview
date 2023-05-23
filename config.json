@@ -2,7 +2,7 @@
   "BINARY_LOCATION": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
   "EXECUTABLE_PATH": "D:\\chromedriver.exe",
   "SCIDIR": {
-    "search_term": "u-net;u-net variations;satellite images;GAN;DNN;",
+    "search_term": "insert query string here",
     "link_file_save_to": "./temp/scidir_search_term.json",
     "abs_file_save_to": "./abs/scidir_search_term.json",
     "use_batches": true,
@@ -10,7 +10,7 @@
     "keep_link_file": true
   },
     "ACM": {
-    "search_term": "Keyword:(image segmentation OR semantic segmentation) AND AllField:(u-net) AND AllField:(forests) AND AllField:(\"remote sensing\" OR \"satellite images\")",
+    "search_term": "insert query string here",
     "link_file_save_to": "./temp/acm_search_term.json",
     "abs_file_save_to": "./abs/acm_search_term.json",
     "use_batches": true,
@@ -18,7 +18,7 @@
     "keep_link_file": true
   },
     "IEEE": {
-    "search_term": "semantic segmentation AND u-net architecture AND forest",
+    "search_term": "insert query string here",
     "link_file_save_to": "./temp/ieee_search_term.json",
     "abs_file_save_to": "./abs/ieee_search_term.json",
     "use_batches": false,
