@@ -1,6 +1,7 @@
 {
   "BINARY_LOCATION": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
   "EXECUTABLE_PATH": "D:\\chromedriver.exe",
+  "API_KEY": "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",
   "SCIDIR": {
     "search_term": "insert query string here",
     "link_file_save_to": "./temp/scidir_search_term.json",
@@ -9,7 +10,7 @@
     "batch_size": 8,
     "keep_link_file": true
   },
-    "ACM": {
+  "ACM": {
     "search_term": "insert query string here",
     "link_file_save_to": "./temp/acm_search_term.json",
     "abs_file_save_to": "./abs/acm_search_term.json",
@@ -17,7 +18,7 @@
     "batch_size": 8,
     "keep_link_file": true
   },
-    "IEEE": {
+  "IEEE": {
     "search_term": "insert query string here",
     "link_file_save_to": "./temp/ieee_search_term.json",
     "abs_file_save_to": "./abs/ieee_search_term.json",

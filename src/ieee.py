@@ -188,7 +188,7 @@ class Paper:
 
     def init_driver(self) -> None:
         """
-        initiate web driver and session
+        initiate a web driver and session
 
         Returns
         -------
@@ -200,7 +200,7 @@ class Paper:
 
     def close_driver(self) -> None:
         """
-        close web driver and session
+        close a web driver and session
 
         Returns
         -------

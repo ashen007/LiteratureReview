@@ -1,19 +1,9 @@
+import openai
 import json
 import os.path
+import pandas as pd
+
 from selenium.webdriver.support.ui import WebDriverWait
-
-
-class ConfigurationError(Exception):
-    """
-    raise when scrapper configuration misses
-    expected key or keys
-    """
-
-    def __int__(self, exp_keys: list):
-        self.exp_keys = exp_keys
-
-    def __repr__(self):
-        return f"{' '.join(self.exp_keys)} one or more keys missing from those."
 
 
 def clean_cookies_and_caches(driver):
@@ -32,6 +22,14 @@ def clean_cookies_and_caches(driver):
 def read_json(file_path):
     with open(file_path, "r") as f:
         return json.load(f)
+
+
+def to_excel(sheets: dict):
+    dfs = {key: pd.read_json(filename) for key, filename in sheets.items()}
+
+    with pd.ExcelWriter('./data/SLR.xlsx') as writer:
+        for sheet, df in dfs.items():
+            df.T.to_excel(writer, sheet_name=sheet)
 
 
 def validate(obj: dict):
@@ -62,3 +60,26 @@ def validate_scrapper_keys(obj: dict, detected: set):
     for s in detected:
         if list(obj[s].keys()) != expected_keys:
             raise ConfigurationError(expected_keys)
+
+
+class ConfigurationError(Exception):
+    """
+    raise when scrapper configuration misses
+    expected key or keys
+    """
+
+    def __int__(self, exp_keys: list):
+        self.exp_keys = exp_keys
+
+    def __repr__(self):
+        return f"{' '.join(self.exp_keys)} one or more keys missing from those."
+
+
+# TODO: complete this class
+class GetSummery:
+    config = read_json('./config.json')
+    openai.api_key = config['API_KEY']
+
+    def __init__(self):
+        self.text_generator = None
+        self.paper_dtls = None
