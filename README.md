@@ -5,14 +5,9 @@ ACM. theses scrapping bots will retrieve link to each search results aka paper, 
 other meta-data such as keywords and abstract, type of paper (conference, journal ect.) which
 useful to do the systematic literature review process make easy.
 
-_*If you found this work usefully put a star on this repo ⭐*_
+_*If you find this work usefully, put a star on this repo ⭐*_
 
-<!-- Place this tag where you want the button to render. -->
-<a class="github-button" href="https://github.com/buttons/github-buttons" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star buttons/github-buttons on GitHub">
-Star</a>
-
-<!-- Place this tag in your head or just before your close body tag. -->
-<script async defer src="https://buttons.github.io/buttons.js"></script>
+https://img.shields.io/github/stars/ashen007/LiteratureReview?style=social
 
 # Prerequisites
 
