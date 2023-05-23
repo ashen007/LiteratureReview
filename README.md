@@ -98,3 +98,8 @@ python main.py
 ```
 
 5) that's it
+6) save results into excel workbook, automatically saved into `./SLR.xlsx` file.
+```python
+   from src.utils import to_excel
+   to_excel({"acm":'./abs/acm_search_term.json', "ieee": './abs/ieee_search_term.json', "science_direct": './abs/scidir_search_term.json'})
+```
