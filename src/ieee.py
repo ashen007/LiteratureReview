@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium_stealth import stealth
-from src.utils import read_json
+from src.utils import *
 
 
 class IEEE:
@@ -196,6 +196,7 @@ class Paper:
         """
         self.driver = undetected_chromedriver.Chrome(chrome_options=self.options,
                                                      executable_path=self.config['EXECUTABLE_PATH'])
+        clean_cookies_and_caches(self.driver)
 
     def close_driver(self) -> None:
         """

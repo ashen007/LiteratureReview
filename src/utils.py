@@ -1,5 +1,6 @@
 import json
 import os.path
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class ConfigurationError(Exception):
@@ -13,6 +14,26 @@ class ConfigurationError(Exception):
 
     def __repr__(self):
         return f"{' '.join(self.exp_keys)} one or more keys missing from those."
+
+
+def clean_cookies_and_caches(driver):
+    # first falls check
+    if driver is not None:
+        driver.delete_all_cookies()
+
+    # step 2
+    # navigate to the settings page
+    driver.get('chrome://settings/clearBrowserData')
+
+    # wait for the button to appear
+    wait = WebDriverWait(driver, 60)
+    wait.until(driver.find_element_by_css_selector('* /deep/ #clearBrowsingDataConfirm'))
+
+    # click the button to clear the cache
+    driver.find_element_by_css_selector('* /deep/ #clearBrowsingDataConfirm').click()
+
+    # wait for the button to be gone before returning
+    wait.until_not(driver.find_element_by_css_selector('* /deep/ #clearBrowsingDataConfirm'))
 
 
 def read_json(file_path):

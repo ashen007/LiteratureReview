@@ -37,6 +37,8 @@ if __name__ == "__main__":
             else:
                 ieee_paper.update_paper_details()
 
+            ieee_paper.to_json(config['IEEE']['abs_file_save_to'])
+
             if not config['IEEE']['keep_link_file']:
                 os.remove(config['IEEE']['link_file_save_to'])
 
@@ -59,6 +61,8 @@ if __name__ == "__main__":
             else:
                 acm_paper.update_paper_details()
 
+            acm_paper.to_json(config['ACM']['abs_file_save_to'])
+
             if not config['ACM']['keep_link_file']:
                 os.remove(config['ACM']['link_file_save_to'])
 
@@ -66,6 +70,10 @@ if __name__ == "__main__":
             # get links to individual search results
             current_year = datetime.now().year
             sd = ScienceDirect((current_year - 5), current_year, config['SCIDIR']['search_term'])
+
+            if sd.driver is not None:
+                sd.driver.delete_all_cookies()
+
             sd.get_links_to_papers()
 
             # dump links
@@ -74,6 +82,9 @@ if __name__ == "__main__":
 
             # get abstract of the and every search results
             sd_paper = SDP(config['SCIDIR']['link_file_save_to'])
+
+            if sd_paper.driver is not None:
+                sd_paper.driver.delete_all_cookies()
 
             if config['SCIDIR']['use_batches']:
                 sd_paper.batch_update_details(config['SCIDIR']['batch_size'])
