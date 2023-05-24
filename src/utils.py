@@ -1,6 +1,4 @@
-import openai
 import json
-import os.path
 import pandas as pd
 
 from selenium.webdriver.support.ui import WebDriverWait
@@ -76,10 +74,10 @@ class ConfigurationError(Exception):
 
 
 # TODO: complete this class
-class GetSummery:
-    config = read_json('./config.json')
-    openai.api_key = config['API_KEY']
-
-    def __init__(self):
-        self.text_generator = None
-        self.paper_dtls = None
+# class GetSummery:
+#     config = read_json('./config.json')
+#     openai.api_key = config['API_KEY']
+#
+#     def __init__(self):
+#         self.text_generator = None
+#         self.paper_dtls = None
