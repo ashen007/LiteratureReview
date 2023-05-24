@@ -1,7 +1,6 @@
 {
   "BINARY_LOCATION": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
   "EXECUTABLE_PATH": "D:\\chromedriver.exe",
-  "API_KEY": "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",
   "SCIDIR": {
     "search_term": "insert query string here",
     "link_file_save_to": "./temp/scidir_search_term.json",
