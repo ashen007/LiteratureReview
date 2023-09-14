@@ -6,3 +6,4 @@ selenium-stealth~=1.0.6
 pytest~=7.3.1
 PyYAML~=6.0
 pandas~=2.0.1
+openpyxl~=3.1.2
